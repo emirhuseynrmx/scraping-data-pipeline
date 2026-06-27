@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 
-Built as a client-ready scraping/data extraction template for CSV, Excel, and analytics workflows.
+Built as a reusable scraping/data extraction template for CSV, Excel, and analytics workflows.
 
 A production-style Python web scraping pipeline with typed records, data validation, exports, tests, CI, and coverage reporting.
 
