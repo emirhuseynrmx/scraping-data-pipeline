@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
+
+LOGGER = logging.getLogger(__name__)
 
 
 class FetchError(RuntimeError):
@@ -55,8 +58,16 @@ class PoliteHttpClient:
                 last_error = exc
                 if attempt == self.config.max_retries:
                     break
+                LOGGER.warning(
+                    "Retrying %s after fetch failure on attempt %s/%s: %s",
+                    url,
+                    attempt,
+                    self.config.max_retries,
+                    exc,
+                )
                 await asyncio.sleep(0.25 * 2 ** (attempt - 1))
 
+        LOGGER.error("Failed to fetch %s after %s attempts", url, self.config.max_retries)
         raise FetchError(f"Failed to fetch {url}") from last_error
 
     async def _respect_delay(self) -> None:

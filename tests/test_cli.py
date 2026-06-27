@@ -10,10 +10,19 @@ import scrape_quality_pipeline.cli as cli
 
 
 def test_cli_books_command(monkeypatch) -> None:
-    async def fake_run_scrape(*, pages: int, output_path: Path, file_format: str):
+    async def fake_run_scrape(
+        *,
+        pages: int,
+        output_path: Path,
+        file_format: str,
+        parser_backend: str,
+        config,
+    ):
         assert pages == 3
         assert output_path == Path("examples/books.csv")
         assert file_format == "csv"
+        assert parser_backend == "selectolax"
+        assert config is None
         return SimpleNamespace(frame=pd.DataFrame({"title": ["A", "B"]}), exported_to=output_path)
 
     monkeypatch.setattr(cli, "run_scrape", fake_run_scrape)

@@ -1,0 +1,17 @@
+{
+  "name": "books-to-scrape",
+  "start_url": "https://books.toscrape.com/index.html",
+  "page_url_template": "https://books.toscrape.com/catalogue/page-{page}.html",
+  "parser_backend": "selectolax",
+  "selectors": {
+    "item": "article.product_pod",
+    "title": "h3 a",
+    "price": ".price_color",
+    "rating": "p.star-rating",
+    "availability": ".availability",
+    "link": "h3 a",
+    "title_attribute": "title",
+    "link_attribute": "href",
+    "rating_attribute": "class"
+  }
+}

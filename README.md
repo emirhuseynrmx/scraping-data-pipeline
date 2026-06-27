@@ -6,13 +6,16 @@
 
 Built as a reusable scraping/data extraction template for CSV, Excel, and analytics workflows.
 
-A production-style Python web scraping pipeline with typed records, data validation, exports, tests, CI, and coverage reporting.
+A production-style Python web scraping pipeline with selector configs, typed records, data validation, exports, tests, CI, and coverage reporting.
 
 - async HTTP client with retry, timeout, and polite request pacing
-- deterministic parser for `books.toscrape.com`
+- reusable `BaseScraper` class for config-driven listing pipelines
+- config-driven selectors for reusable listing scrapers
+- parser backend support for `selectolax` and BeautifulSoup + `lxml`
 - Pydantic v2 models for record-level validation
 - `pandera` schema validation before exporting data
-- CSV and JSONL export
+- CSV, JSONL, Excel, and Parquet export
+- Rich progress output, retry logging, and structured failed-page logging
 - offline unit tests with fixtures
 - GitHub Actions + Codecov-ready coverage
 
@@ -23,6 +26,17 @@ This is intentionally more than a one-file scraper. The goal is to show how a sm
 ```bash
 pip install -e ".[dev]"
 scrape-books --pages 2 --out examples/books.csv --format csv
+```
+
+Use a selector config instead of the built-in default:
+
+```bash
+scrape-books \
+  --pages 2 \
+  --config examples/configs/books_to_scrape.json \
+  --parser beautifulsoup \
+  --out examples/books.xlsx \
+  --format xlsx
 ```
 
 ## Preview
@@ -63,9 +77,21 @@ pytest
 Expected coverage includes:
 
 - parser behavior on stable fixture HTML
+- selector config parsing with multiple parser backends
 - schema validation success/failure
 - pipeline orchestration without live network calls
-- CSV and JSONL export
+- CSV, JSONL, Excel, and Parquet export
+
+## Selector Configs
+
+Reusable scraper settings live in `examples/configs/`. A config controls:
+
+- listing page URL pattern
+- card selector
+- title, price, rating, availability, and link selectors
+- parser backend: `selectolax` or `beautifulsoup`
+
+The built-in `books.toscrape.com` scraper uses the same config path internally, so the demo is also a template for other listing pages.
 
 ## Ethical Scraping Defaults
 

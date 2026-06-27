@@ -20,3 +20,16 @@ def test_parse_books_page_extracts_expected_records() -> None:
     assert records[0].in_stock is True
     assert str(records[0].product_url) == "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
     assert records[0].scraped_at == scraped_at
+
+
+def test_parse_books_page_supports_beautifulsoup_backend() -> None:
+    html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
+
+    records = parse_books_page(
+        html,
+        source_url="https://books.toscrape.com/index.html",
+        parser_backend="beautifulsoup",
+    )
+
+    assert len(records) == 2
+    assert records[1].title == "Tipping the Velvet"

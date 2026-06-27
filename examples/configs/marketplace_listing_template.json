@@ -1,0 +1,17 @@
+{
+  "name": "marketplace-listing",
+  "start_url": "https://example.com/search?q=laptops",
+  "page_url_template": "https://example.com/search?q=laptops&page={page}",
+  "parser_backend": "selectolax",
+  "selectors": {
+    "item": "[data-testid='listing-card']",
+    "title": "[data-testid='listing-title']",
+    "price": "[data-testid='listing-price']",
+    "rating": "[data-testid='listing-rating']",
+    "availability": "[data-testid='listing-availability']",
+    "link": "a[data-testid='listing-link']",
+    "title_attribute": "text",
+    "link_attribute": "href",
+    "rating_attribute": "data-rating"
+  }
+}

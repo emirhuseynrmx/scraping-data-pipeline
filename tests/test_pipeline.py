@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
+from scrape_quality_pipeline.configs import books_to_scrape_config
 from scrape_quality_pipeline.exporters import export_frame
 from scrape_quality_pipeline.parser import parse_books_page
-from scrape_quality_pipeline.pipeline import catalog_page_url, scrape_books
+from scrape_quality_pipeline.pipeline import BaseScraper, catalog_page_url, scrape_books
 from scrape_quality_pipeline.schema import validate_books
 
 
@@ -15,6 +17,12 @@ class FakeClient:
         self.html = html
         self.urls: list[str] = []
 
+    async def fetch_text(self, url: str) -> str:
+        self.urls.append(url)
+        return self.html
+
+
+class TimestampClient(FakeClient):
     async def fetch_text(self, url: str) -> str:
         self.urls.append(url)
         return self.html
@@ -39,6 +47,18 @@ async def test_scrape_books_uses_client_and_validates_records() -> None:
     ]
 
 
+@pytest.mark.asyncio
+async def test_base_scraper_uses_config_driven_pages() -> None:
+    html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
+    client = FakeClient(html)
+    scraper = BaseScraper(client, books_to_scrape_config())
+
+    frame = await scraper.scrape(pages=1)
+
+    assert len(frame) == 2
+    assert client.urls == ["https://books.toscrape.com/index.html"]
+
+
 def test_export_frame_writes_csv_and_jsonl(tmp_path: Path) -> None:
     html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
     records = parse_books_page(
@@ -52,6 +72,35 @@ def test_export_frame_writes_csv_and_jsonl(tmp_path: Path) -> None:
 
     assert csv_path.read_text(encoding="utf-8").startswith("title,price_gbp")
     assert len(jsonl_path.read_text(encoding="utf-8").splitlines()) == 2
+
+
+def test_export_frame_writes_excel_and_parquet(tmp_path: Path) -> None:
+    html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
+    frame = validate_books(
+        parse_books_page(
+            html,
+            source_url="https://books.toscrape.com/index.html",
+        )
+    )
+
+    xlsx_path = export_frame(frame, tmp_path / "books.xlsx", "xlsx")
+    parquet_path = export_frame(frame, tmp_path / "books.parquet", "parquet")
+
+    assert xlsx_path.exists()
+    assert parquet_path.exists()
+
+
+def test_parse_books_page_uses_page_level_timestamp() -> None:
+    html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
+    scraped_at = datetime(2026, 1, 1, 12, 30, tzinfo=timezone.utc)
+
+    records = parse_books_page(
+        html,
+        source_url="https://books.toscrape.com/index.html",
+        scraped_at=scraped_at,
+    )
+
+    assert {record.scraped_at for record in records} == {scraped_at}
 
 
 def test_export_frame_rejects_unknown_format(tmp_path: Path) -> None:

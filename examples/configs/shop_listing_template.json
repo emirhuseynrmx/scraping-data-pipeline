@@ -1,0 +1,17 @@
+{
+  "name": "generic-shop-listing",
+  "start_url": "https://example.com/products",
+  "page_url_template": "https://example.com/products?page={page}",
+  "parser_backend": "beautifulsoup",
+  "selectors": {
+    "item": ".product-card",
+    "title": ".product-card__title",
+    "price": ".product-card__price",
+    "rating": ".product-card__rating",
+    "availability": ".product-card__stock",
+    "link": ".product-card__title a",
+    "title_attribute": "text",
+    "link_attribute": "href",
+    "rating_attribute": "data-rating"
+  }
+}

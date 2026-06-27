@@ -11,5 +11,7 @@ build/
 *.egg-info/
 examples/*.csv
 examples/*.jsonl
+examples/*.xlsx
+examples/*.parquet
 !examples/.gitkeep
 !examples/books_sample.csv
