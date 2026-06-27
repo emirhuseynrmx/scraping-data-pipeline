@@ -2,21 +2,22 @@ from __future__ import annotations
 
 import asyncio
 import time
-from dataclasses import dataclass
 
 import httpx
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class FetchError(RuntimeError):
     """Raised after the HTTP client exhausts retries."""
 
 
-@dataclass(frozen=True)
-class HttpClientConfig:
+class HttpClientConfig(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     user_agent: str = "scrape-quality-pipeline/0.1 (+portfolio demo)"
-    timeout_seconds: float = 15.0
-    max_retries: int = 3
-    min_delay_seconds: float = 0.5
+    timeout_seconds: float = Field(default=15.0, gt=0)
+    max_retries: int = Field(default=3, ge=1)
+    min_delay_seconds: float = Field(default=0.5, ge=0)
 
 
 class PoliteHttpClient:

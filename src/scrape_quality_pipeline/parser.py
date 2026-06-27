@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from selectolax.parser import HTMLParser
@@ -49,7 +49,7 @@ def parse_books_page(
     if not articles:
         raise ParseError("No product cards found on page")
 
-    timestamp = scraped_at or datetime.now(UTC)
+    timestamp = scraped_at or datetime.now(timezone.utc)
     records: list[BookRecord] = []
 
     for article in articles:

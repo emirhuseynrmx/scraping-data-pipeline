@@ -1,18 +1,32 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
 from datetime import datetime
 
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic.functional_validators import field_validator
 
-@dataclass(frozen=True)
-class BookRecord:
+
+class BookRecord(BaseModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
     title: str
-    price_gbp: float
+    price_gbp: float = Field(gt=0)
     rating: str
     in_stock: bool
-    product_url: str
-    source_url: str
+    product_url: HttpUrl
+    source_url: HttpUrl
     scraped_at: datetime
 
     def to_dict(self) -> dict[str, object]:
-        return asdict(self)
+        data = self.model_dump(mode="python")
+        data["product_url"] = str(self.product_url)
+        data["source_url"] = str(self.source_url)
+        return data
+
+    @field_validator("rating")
+    @classmethod
+    def validate_rating(cls, value: str) -> str:
+        allowed = {"One", "Two", "Three", "Four", "Five"}
+        if value not in allowed:
+            raise ValueError(f"rating must be one of {sorted(allowed)}")
+        return value

@@ -1,19 +1,20 @@
 # Scrape Quality Pipeline
 
-[![CI](https://github.com/emirhuseynrmx/scrape-quality-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/emirhuseynrmx/scrape-quality-pipeline/actions)
-[![codecov](https://codecov.io/gh/emirhuseynrmx/scrape-quality-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/emirhuseynrmx/scrape-quality-pipeline)
+[![CI](https://github.com/emirhuseynrmx/scraping-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/emirhuseynrmx/scraping-data-pipeline/actions)
+[![codecov](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 
-A production-style web scraping example built for portfolio and client work:
+A production-style Python web scraping pipeline with typed records, data validation, exports, tests, CI, and coverage reporting.
 
 - async HTTP client with retry, timeout, and polite request pacing
 - deterministic parser for `books.toscrape.com`
+- Pydantic v2 models for record-level validation
 - `pandera` schema validation before exporting data
 - CSV and JSONL export
 - offline unit tests with fixtures
 - GitHub Actions + Codecov-ready coverage
 
-This is intentionally more than a one-file scraper. It demonstrates the kind of quality bar useful for freelance web scraping, lead generation, price monitoring, directory extraction, and data enrichment projects.
+This is intentionally more than a one-file scraper. The goal is to show how a small scraping project can be structured like maintainable data infrastructure: clear boundaries, reproducible tests, typed models, and validation before data leaves the pipeline.
 
 ## Demo
 
@@ -36,14 +37,14 @@ Example output columns:
 
 ## Why Pandera?
 
-Scraping is not finished when HTML is parsed. Client-ready scraping needs data contracts:
+Scraping is not finished when HTML is parsed. Reliable scraping needs data contracts:
 
 - prices must be numeric and positive
 - URLs must be valid HTTP(S) URLs
 - ratings must be one of the expected values
 - exported columns must not silently drift
 
-`pandera` catches those issues before a bad CSV reaches a client, dashboard, CRM, or database.
+`pandera` catches those issues before a bad CSV reaches a dashboard, CRM, notebook, or database.
 
 ## Run Tests
 
@@ -60,7 +61,7 @@ Expected coverage includes:
 
 ## Ethical Scraping Defaults
 
-This project is a technical demo. Real client scraping should include:
+This project is a technical demo. Real scraping work should include:
 
 - robots.txt and terms review
 - reasonable rate limits
@@ -68,16 +69,3 @@ This project is a technical demo. Real client scraping should include:
 - no login bypassing
 - no collection of private or sensitive data
 - caching where possible
-
-## Upwork Project Positioning
-
-Use this repo as proof for a catalog offer like:
-
-> I will build a validated Python web scraping and data extraction pipeline with tests, clean exports, and monitoring-ready data quality checks.
-
-Suggested packages:
-
-- **Starter:** one public website, CSV output, basic validation
-- **Standard:** pagination, retries, schema validation, tests, JSONL/CSV
-- **Advanced:** multi-source extraction, scheduling-ready pipeline, CI, Codecov, handoff docs
-
