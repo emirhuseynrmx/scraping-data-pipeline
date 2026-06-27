@@ -33,7 +33,9 @@ jobs:
         run: pytest
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
+          flags: python-${{ matrix.python-version }}
           fail_ci_if_error: false
