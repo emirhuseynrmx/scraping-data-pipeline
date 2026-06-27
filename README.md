@@ -4,6 +4,8 @@
 [![codecov](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 
+Built as a client-ready scraping/data extraction template for CSV, Excel, and analytics workflows.
+
 A production-style Python web scraping pipeline with typed records, data validation, exports, tests, CI, and coverage reporting.
 
 - async HTTP client with retry, timeout, and polite request pacing
@@ -22,6 +24,12 @@ This is intentionally more than a one-file scraper. The goal is to show how a sm
 pip install -e ".[dev]"
 scrape-books --pages 2 --out examples/books.csv --format csv
 ```
+
+## Preview
+
+![Terminal output showing a successful scrape and test run](docs/assets/terminal-output.png)
+
+![CSV output preview from examples/books.csv](docs/assets/csv-output.png)
 
 Example output columns:
 
