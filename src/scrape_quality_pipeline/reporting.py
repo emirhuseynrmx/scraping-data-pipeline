@@ -74,7 +74,7 @@ def generate_sample_report(
 
 def render_typst(report: ScrapeReport) -> str:
     rating_rows = "\n".join(
-        f"  [{_typ_text(rating)}], [{count}],"
+        _rating_bar_row(rating, count, max(report.rating_counts.values(), default=1))
         for rating, count in report.rating_counts.items()
     )
     sample_rows = "\n".join(_sample_row(record) for record in report.sample_records)
@@ -99,7 +99,7 @@ def render_typst(report: ScrapeReport) -> str:
 = {_typ_text(report.title)}
 
 #text(fill: muted)[
-  Scrape run summary for a public listing extraction job. The report shows
+  Custom data pipeline report for a public listing extraction job. The report shows
   row counts, data contracts, price range, availability, and sample records.
 ]
 
@@ -110,28 +110,24 @@ def render_typst(report: ScrapeReport) -> str:
 ][
   #stat("In stock", "{stock_rate:.0f}%", color: good)
 ][
-  #stat("Avg price", "GBP {report.average_price:,.2f}")
+  #stat("Avg price", "£{report.average_price:,.2f}")
 ]
 
 == Price Range
 
 #grid(columns: (1fr, 1fr, 1fr), gutter: 8pt)[
-  #stat("Minimum", "GBP {report.min_price:,.2f}")
+  #stat("Minimum", "£{report.min_price:,.2f}")
 ][
-  #stat("Maximum", "GBP {report.max_price:,.2f}")
+  #stat("Maximum", "£{report.max_price:,.2f}")
 ][
   #stat("Source pages", "{report.source_pages}")
 ]
 
 == Rating Distribution
 
-#table(
-  columns: (1fr, 1fr),
-  inset: 5pt,
-  stroke: rgb("#d0d5dd"),
-  [*Rating*], [*Records*],
+#block(inset: 8pt, stroke: rgb("#d0d5dd"), radius: 5pt)[
 {rating_rows}
-)
+]
 
 == Sample Records
 
@@ -176,9 +172,9 @@ def _sample_row(record: dict[str, Any]) -> str:
         title = f"{title[:39]}..."
     return (
         f"  [{_typ_text(title)}],"
-        f" [GBP {float(record.get('price_gbp', 0)):,.2f}],"
+        f" [£{float(record.get('price_gbp', 0)):,.2f}],"
         f" [{_typ_text(record.get('rating'))}],"
-        f" [{_typ_text(record.get('in_stock'))}],"
+        f" [{_typ_text(_yes_no(record.get('in_stock')))}],"
     )
 
 
@@ -195,3 +191,19 @@ def _typ_text(value: Any) -> str:
     for old, new in replacements.items():
         text = text.replace(old, new)
     return text
+
+
+def _yes_no(value: Any) -> str:
+    if isinstance(value, str):
+        return "Yes" if value.strip().lower() in {"true", "1", "yes"} else "No"
+    return "Yes" if bool(value) else "No"
+
+
+def _rating_bar_row(rating: str, count: int, max_count: int) -> str:
+    width = 5 if max_count == 0 else max(5, int(count / max_count * 100))
+    return (
+        f"#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)["
+        f"#text(weight: \"bold\")[{_typ_text(rating)}]"
+        f"][#rect(width: {width}%, height: 7pt, fill: accent, radius: 3pt)]"
+        f"[#align(right)[{count}]]\n#v(5pt)"
+    )
