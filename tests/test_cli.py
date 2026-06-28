@@ -23,7 +23,11 @@ def test_cli_books_command(monkeypatch) -> None:
         assert file_format == "csv"
         assert parser_backend == "selectolax"
         assert config is None
-        return SimpleNamespace(frame=pd.DataFrame({"title": ["A", "B"]}), exported_to=output_path)
+        return SimpleNamespace(
+            frame=pd.DataFrame({"title": ["A", "B"]}),
+            exported_to=output_path,
+            manifest_path=output_path.parent / "scrape_manifest.json",
+        )
 
     monkeypatch.setattr(cli, "run_scrape", fake_run_scrape)
 
@@ -32,3 +36,4 @@ def test_cli_books_command(monkeypatch) -> None:
     assert result.exit_code == 0
     assert "Scraped 2 records" in result.output
     assert "examples\\books.csv" in result.output or "examples/books.csv" in result.output
+    assert "scrape_manifest.json" in result.output

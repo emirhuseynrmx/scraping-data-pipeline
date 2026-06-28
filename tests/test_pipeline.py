@@ -8,7 +8,12 @@ import pytest
 from scrape_quality_pipeline.configs import books_to_scrape_config
 from scrape_quality_pipeline.exporters import export_frame
 from scrape_quality_pipeline.parser import parse_books_page
-from scrape_quality_pipeline.pipeline import BaseScraper, catalog_page_url, scrape_books
+from scrape_quality_pipeline.pipeline import (
+    BaseScraper,
+    build_scrape_manifest,
+    catalog_page_url,
+    scrape_books,
+)
 from scrape_quality_pipeline.schema import validate_books
 
 
@@ -114,3 +119,24 @@ def test_export_frame_rejects_unknown_format(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Unsupported export format"):
         export_frame(frame, tmp_path / "books.xml", "xml")
+
+
+def test_scrape_manifest_records_schema_and_sources(tmp_path: Path) -> None:
+    html = Path("tests/fixtures/books_page.html").read_text(encoding="utf-8")
+    frame = validate_books(
+        parse_books_page(
+            html,
+            source_url="https://books.toscrape.com/index.html",
+        )
+    )
+
+    manifest = build_scrape_manifest(
+        frame=frame,
+        config=books_to_scrape_config(),
+        pages=1,
+        exported_to=tmp_path / "books.csv",
+    )
+
+    assert manifest.records_exported == 2
+    assert manifest.source_pages == ["https://books.toscrape.com/index.html"]
+    assert "price_gbp" in manifest.schema_columns

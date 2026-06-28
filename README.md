@@ -15,6 +15,7 @@ A production-style Python web scraping pipeline with selector configs, typed rec
 - Pydantic v2 models for record-level validation
 - `pandera` schema validation before exporting data
 - CSV, JSONL, Excel, and Parquet export
+- per-run `scrape_manifest.json` with source pages, schema columns, and output path
 - Rich progress output, retry logging, and structured failed-page logging
 - offline unit tests with fixtures
 - GitHub Actions + Codecov-ready coverage
@@ -27,6 +28,8 @@ This is intentionally more than a one-file scraper. The goal is to show how a sm
 pip install -e ".[dev]"
 scrape-books --pages 2 --out examples/books.csv --format csv
 ```
+
+When an output path is provided, the same folder also receives `scrape_manifest.json`.
 
 Use a selector config instead of the built-in default:
 

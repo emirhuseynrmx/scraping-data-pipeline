@@ -63,3 +63,18 @@ class ScraperConfig(BaseModel):
         if page_number == 1 or self.page_url_template is None:
             return str(self.start_url)
         return self.page_url_template.format(page=page_number)
+
+
+class ScrapeManifest(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    run_id: str
+    generated_at: datetime
+    scraper_name: str
+    parser_backend: str
+    pages_requested: int
+    records_exported: int
+    source_pages: list[str]
+    output_file: str | None
+    schema_columns: list[str]
+    notes: list[str] = Field(default_factory=list)

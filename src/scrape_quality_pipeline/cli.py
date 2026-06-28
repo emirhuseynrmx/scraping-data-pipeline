@@ -51,3 +51,4 @@ def books(
     )
     typer.echo(f"Scraped {len(result.frame)} records")
     typer.echo(f"Exported to {result.exported_to}")
+    typer.echo(f"Manifest: {result.manifest_path}")
