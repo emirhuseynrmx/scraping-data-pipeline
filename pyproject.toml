@@ -34,13 +34,14 @@ dev = [
 
 [project.scripts]
 scrape-books = "scrape_quality_pipeline.cli:app"
+generate-scraping-report = "scrape_quality_pipeline.reporting:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=scrape_quality_pipeline --cov-report=term-missing --cov-report=xml"
+addopts = "--basetemp=.pytest_tmp --cov=scrape_quality_pipeline --cov-report=term-missing --cov-report=xml"
 asyncio_mode = "auto"
 markers = [
     "integration: tests that may call live websites",
