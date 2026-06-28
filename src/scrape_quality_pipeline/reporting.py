@@ -99,8 +99,8 @@ def render_typst(report: ScrapeReport) -> str:
 = {_typ_text(report.title)}
 
 #text(fill: muted)[
-  Custom data pipeline report for a public listing extraction job. The report shows
-  row counts, data contracts, price range, availability, and sample records.
+  Public listing extraction report with row counts, data contracts, price range,
+  availability, rating distribution, and sample records.
 ]
 
 #grid(columns: (1fr, 1fr, 1fr, 1fr), gutter: 8pt)[
@@ -110,15 +110,15 @@ def render_typst(report: ScrapeReport) -> str:
 ][
   #stat("In stock", "{stock_rate:.0f}%", color: good)
 ][
-  #stat("Avg price", "£{report.average_price:,.2f}")
+  #stat("Avg price", "GBP {report.average_price:,.2f}")
 ]
 
 == Price Range
 
 #grid(columns: (1fr, 1fr, 1fr), gutter: 8pt)[
-  #stat("Minimum", "£{report.min_price:,.2f}")
+  #stat("Minimum", "GBP {report.min_price:,.2f}")
 ][
-  #stat("Maximum", "£{report.max_price:,.2f}")
+  #stat("Maximum", "GBP {report.max_price:,.2f}")
 ][
   #stat("Source pages", "{report.source_pages}")
 ]
@@ -139,7 +139,7 @@ def render_typst(report: ScrapeReport) -> str:
 {sample_rows}
 )
 
-== Delivery Notes
+== Report Notes
 
 - CSV output: `{_typ_text(report.csv_path)}`
 - Pydantic validates each parsed record before export.
@@ -172,7 +172,7 @@ def _sample_row(record: dict[str, Any]) -> str:
         title = f"{title[:39]}..."
     return (
         f"  [{_typ_text(title)}],"
-        f" [£{float(record.get('price_gbp', 0)):,.2f}],"
+        f" [GBP {float(record.get('price_gbp', 0)):,.2f}],"
         f" [{_typ_text(record.get('rating'))}],"
         f" [{_typ_text(_yes_no(record.get('in_stock')))}],"
     )

@@ -45,7 +45,7 @@ scrape-books \
 
 ![CSV output preview from examples/books.csv](docs/assets/csv-output.png)
 
-Generate a client-ready PDF report from the sample output:
+Generate a PDF report from the sample output:
 
 ```bash
 generate-scraping-report examples/books_sample.csv --out outputs/sample_report

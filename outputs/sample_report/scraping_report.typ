@@ -18,8 +18,8 @@
 = Scraping Data Quality Report
 
 #text(fill: muted)[
-  Scrape run summary for a public listing extraction job. The report shows
-  row counts, data contracts, price range, availability, and sample records.
+  Public listing extraction report with row counts, data contracts, price range,
+  availability, rating distribution, and sample records.
 ]
 
 #grid(columns: (1fr, 1fr, 1fr, 1fr), gutter: 8pt)[
@@ -44,17 +44,18 @@
 
 == Rating Distribution
 
-#table(
-  columns: (1fr, 1fr),
-  inset: 5pt,
-  stroke: rgb("#d0d5dd"),
-  [*Rating*], [*Records*],
-  [Five], [4],
-  [Four], [4],
-  [One], [6],
-  [Three], [3],
-  [Two], [3],
-)
+#block(inset: 8pt, stroke: rgb("#d0d5dd"), radius: 5pt)[
+#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)[#text(weight: "bold")[Five]][#rect(width: 66%, height: 7pt, fill: accent, radius: 3pt)][#align(right)[4]]
+#v(5pt)
+#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)[#text(weight: "bold")[Four]][#rect(width: 66%, height: 7pt, fill: accent, radius: 3pt)][#align(right)[4]]
+#v(5pt)
+#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)[#text(weight: "bold")[One]][#rect(width: 100%, height: 7pt, fill: accent, radius: 3pt)][#align(right)[6]]
+#v(5pt)
+#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)[#text(weight: "bold")[Three]][#rect(width: 50%, height: 7pt, fill: accent, radius: 3pt)][#align(right)[3]]
+#v(5pt)
+#grid(columns: (70pt, 1fr, 28pt), gutter: 8pt)[#text(weight: "bold")[Two]][#rect(width: 50%, height: 7pt, fill: accent, radius: 3pt)][#align(right)[3]]
+#v(5pt)
+]
 
 == Sample Records
 
@@ -63,15 +64,15 @@
   inset: 5pt,
   stroke: rgb("#d0d5dd"),
   [*Title*], [*Price*], [*Rating*], [*In Stock*],
-  [A Light in the Attic], [GBP 51.77], [Three], [True],
-  [Tipping the Velvet], [GBP 53.74], [One], [True],
-  [Soumission], [GBP 50.10], [One], [True],
-  [Sharp Objects], [GBP 47.82], [Four], [True],
-  [Sapiens: A Brief History of Humankind], [GBP 54.23], [Five], [True],
-  [The Requiem Red], [GBP 22.65], [One], [True],
+  [A Light in the Attic], [GBP 51.77], [Three], [Yes],
+  [Tipping the Velvet], [GBP 53.74], [One], [Yes],
+  [Soumission], [GBP 50.10], [One], [Yes],
+  [Sharp Objects], [GBP 47.82], [Four], [Yes],
+  [Sapiens: A Brief History of Humankind], [GBP 54.23], [Five], [Yes],
+  [The Requiem Red], [GBP 22.65], [One], [Yes],
 )
 
-== Delivery Notes
+== Report Notes
 
 - CSV output: `examples/books_sample.csv`
 - Pydantic validates each parsed record before export.
