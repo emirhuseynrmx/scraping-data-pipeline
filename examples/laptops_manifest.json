@@ -1,0 +1,27 @@
+{
+  "run_id": "01fd95c5a8214f60a32613cfbec77570",
+  "generated_at": "2026-06-30T23:10:00.850648Z",
+  "scraper_name": "webscraper-laptops",
+  "parser_backend": "selectolax",
+  "pages_requested": 1,
+  "records_exported": 117,
+  "source_pages": [
+    "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+  ],
+  "output_file": "examples/laptops.csv",
+  "schema_columns": [
+    "name",
+    "price_usd",
+    "description",
+    "rating",
+    "review_count",
+    "product_url",
+    "source_url",
+    "scraped_at"
+  ],
+  "notes": [
+    "Only public listing pages are used.",
+    "Selectors come from the configured scraper contract.",
+    "Exports are validated with Pandera before handoff."
+  ]
+}

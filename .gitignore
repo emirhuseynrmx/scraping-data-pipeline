@@ -16,3 +16,7 @@ examples/*.xlsx
 examples/*.parquet
 !examples/.gitkeep
 !examples/books_sample.csv
+!examples/books.csv
+!examples/laptops.csv
+!examples/scrape_manifest.json
+!examples/laptops_manifest.json

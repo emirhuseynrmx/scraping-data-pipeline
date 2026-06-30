@@ -11,7 +11,7 @@ from selectolax.parser import HTMLParser
 from selectolax.parser import Node as SelectolaxNode
 
 from scrape_quality_pipeline.configs import books_to_scrape_config
-from scrape_quality_pipeline.models import BookRecord, ScraperConfig
+from scrape_quality_pipeline.models import BookRecord, ProductRecord, ScraperConfig
 
 PRICE_RE = re.compile(r"([0-9]+(?:\.[0-9]+)?)")
 
@@ -148,6 +148,67 @@ def parse_product_page(
                 rating=rating_value,
                 in_stock="in stock" in availability,
                 product_url=urljoin(source_url, href),
+                source_url=source_url,
+                scraped_at=timestamp,
+            )
+        )
+
+    return records
+
+
+def parse_product_listing(
+    html: str,
+    *,
+    source_url: str,
+    config: ScraperConfig,
+    scraped_at: datetime | None = None,
+) -> list[ProductRecord]:
+    parser = _parse_html(html, config.parser_backend)
+    items = parser.css(config.selectors.item)
+    if not items:
+        raise ParseError(f"No product cards found with selector: {config.selectors.item}")
+
+    timestamp = scraped_at or datetime.now(timezone.utc)
+    records: list[ProductRecord] = []
+
+    for item in items:
+        link = item.css_first("a.title")
+        if link is None:
+            continue
+        name = link.attr("title") or link.text()
+        href = link.attr("href")
+        if not name or not href:
+            continue
+
+        price_span = item.css_first("h4.price span")
+        if price_span is None:
+            continue
+        try:
+            price = _parse_price(price_span.text())
+        except ParseError:
+            continue
+
+        desc_node = item.css_first("p.description")
+        description = desc_node.text() if desc_node else ""
+
+        stars = len(item.css(".ws-icon-star"))
+
+        review_node = item.css_first(".review-count span")
+        try:
+            review_count = int(review_node.text()) if review_node else 0
+        except (ValueError, TypeError):
+            review_count = 0
+
+        product_url = href if href.startswith("http") else f"https://webscraper.io{href}"
+
+        records.append(
+            ProductRecord(
+                name=name,
+                price_usd=price,
+                description=description,
+                rating=stars,
+                review_count=review_count,
+                product_url=product_url,
                 source_url=source_url,
                 scraped_at=timestamp,
             )

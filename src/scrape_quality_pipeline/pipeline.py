@@ -14,9 +14,9 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from scrape_quality_pipeline.configs import books_to_scrape_config
 from scrape_quality_pipeline.exporters import export_frame
 from scrape_quality_pipeline.http_client import PoliteHttpClient
-from scrape_quality_pipeline.models import BookRecord, ScrapeManifest, ScraperConfig
-from scrape_quality_pipeline.parser import parse_product_page
-from scrape_quality_pipeline.schema import validate_books
+from scrape_quality_pipeline.models import BookRecord, ProductRecord, ScrapeManifest, ScraperConfig
+from scrape_quality_pipeline.parser import parse_product_listing, parse_product_page
+from scrape_quality_pipeline.schema import validate_books, validate_products
 
 BASE_URL = "https://books.toscrape.com/catalogue/"
 LOGGER = logging.getLogger(__name__)
@@ -132,6 +132,79 @@ async def run_scrape(
                 exported_to=exported_to,
             ),
             exported_to.parent / "scrape_manifest.json",
+        )
+    return ScrapeResult(frame=frame, exported_to=exported_to, manifest_path=manifest_path)
+
+
+async def scrape_product_pages(
+    client: PoliteHttpClient,
+    *,
+    config: ScraperConfig,
+    pages: int = 1,
+    show_progress: bool = False,
+) -> pd.DataFrame:
+    if pages < 1:
+        raise ValueError("pages must be >= 1")
+
+    records: list[ProductRecord] = []
+    progress = Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        TimeElapsedColumn(),
+        console=CONSOLE,
+        disable=not show_progress,
+    )
+    with progress:
+        task_id = progress.add_task(f"Scraping {config.name}", total=pages)
+        for page_number in range(1, pages + 1):
+            source_url = config.page_url(page_number)
+            try:
+                html = await client.fetch_text(source_url)
+                scraped_at = datetime.now(timezone.utc)
+                records.extend(
+                    parse_product_listing(
+                        html,
+                        source_url=source_url,
+                        config=config,
+                        scraped_at=scraped_at,
+                    )
+                )
+                progress.advance(task_id)
+            except Exception:
+                LOGGER.exception("Failed to scrape page %s: %s", page_number, source_url)
+                progress.advance(task_id)
+                continue
+
+    return validate_products(records)
+
+
+async def run_products_scrape(
+    *,
+    pages: int = 1,
+    output_path: Path | None = None,
+    file_format: str = "csv",
+    config: ScraperConfig,
+    show_progress: bool = True,
+) -> ScrapeResult:
+    async with PoliteHttpClient() as client:
+        frame = await scrape_product_pages(
+            client,
+            config=config,
+            pages=pages,
+            show_progress=show_progress,
+        )
+
+    exported_to = export_frame(frame, output_path, file_format) if output_path else None
+    manifest_path = None
+    if exported_to is not None:
+        manifest_path = write_manifest(
+            build_scrape_manifest(
+                frame=frame,
+                config=config,
+                pages=pages,
+                exported_to=exported_to,
+            ),
+            exported_to.parent / "laptops_manifest.json",
         )
     return ScrapeResult(frame=frame, exported_to=exported_to, manifest_path=manifest_path)
 

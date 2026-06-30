@@ -34,6 +34,7 @@ dev = [
 
 [project.scripts]
 scrape-books = "scrape_quality_pipeline.cli:app"
+scrape-laptops = "scrape_quality_pipeline.cli:laptops_app"
 generate-scraping-report = "scrape_quality_pipeline.reporting:main"
 
 [tool.setuptools.packages.find]

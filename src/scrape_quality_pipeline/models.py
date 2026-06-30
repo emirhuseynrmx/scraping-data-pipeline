@@ -65,6 +65,25 @@ class ScraperConfig(BaseModel):
         return self.page_url_template.format(page=page_number)
 
 
+class ProductRecord(BaseModel):
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+    name: str
+    price_usd: float = Field(gt=0)
+    description: str
+    rating: int = Field(ge=0, le=5)
+    review_count: int = Field(ge=0)
+    product_url: HttpUrl
+    source_url: HttpUrl
+    scraped_at: datetime
+
+    def to_dict(self) -> dict[str, object]:
+        data = self.model_dump(mode="python")
+        data["product_url"] = str(self.product_url)
+        data["source_url"] = str(self.source_url)
+        return data
+
+
 class ScrapeManifest(BaseModel):
     model_config = ConfigDict(frozen=True)
 

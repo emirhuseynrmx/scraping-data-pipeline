@@ -26,5 +26,24 @@ def books_to_scrape_config(
     )
 
 
+def webscraper_laptops_config(
+    *,
+    parser_backend: Literal["selectolax", "beautifulsoup"] = "selectolax",
+) -> ScraperConfig:
+    return ScraperConfig(
+        name="webscraper-laptops",
+        start_url="https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+        selectors=ProductSelectors(
+            item="div.card.thumbnail",
+            title="a.title",
+            link="a.title",
+            rating="p[data-rating]",
+            price="h4.price span",
+            availability="",
+        ),
+        parser_backend=parser_backend,
+    )
+
+
 def load_scraper_config(path: Path) -> ScraperConfig:
     return ScraperConfig.model_validate_json(path.read_text(encoding="utf-8"))
