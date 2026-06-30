@@ -42,4 +42,6 @@ def records_to_frame(records: Iterable[BookRecord]) -> pd.DataFrame:
 
 def validate_books(records: Iterable[BookRecord]) -> pd.DataFrame:
     frame = records_to_frame(records)
+    if frame.empty:
+        return pd.DataFrame(columns=list(BOOK_SCHEMA.columns.keys()))
     return BOOK_SCHEMA.validate(frame, lazy=True)

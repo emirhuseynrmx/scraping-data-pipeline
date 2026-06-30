@@ -97,7 +97,8 @@ async def scrape_pages(
                 progress.advance(task_id)
             except Exception:
                 LOGGER.exception("Failed to scrape page %s: %s", page_number, source_url)
-                raise
+                progress.advance(task_id)
+                continue
 
     return validate_books(records)
 
