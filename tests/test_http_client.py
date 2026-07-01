@@ -15,13 +15,13 @@ async def test_polite_http_client_fetches_text_with_user_agent() -> None:
         return httpx.Response(200, text="ok")
 
     transport = httpx.MockTransport(handler)
-    config = HttpClientConfig(user_agent="portfolio-test", min_delay_seconds=0, max_retries=1)
+    config = HttpClientConfig(user_agent="pipeline-test", min_delay_seconds=0, max_retries=1)
 
     async with PoliteHttpClient(config=config, transport=transport) as client:
         text = await client.fetch_text("https://example.com")
 
     assert text == "ok"
-    assert seen_user_agents == ["portfolio-test"]
+    assert seen_user_agents == ["pipeline-test"]
 
 
 @pytest.mark.asyncio

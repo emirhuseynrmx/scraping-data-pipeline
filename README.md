@@ -69,13 +69,20 @@ scrape-books \
 
 ![CSV output preview from examples/books.csv](docs/assets/csv-output.png)
 
-Generate a PDF report from the sample output:
+Generate a 10,000-row PDF report from the validated scrape output:
 
 ```bash
-generate-scraping-report examples/books_sample.csv --out outputs/sample_report
+generate-scraping-report examples/books.csv \
+  --rows 10000 \
+  --expanded-csv outputs/scale_10k/books_10k.csv \
+  --out outputs/scale_10k \
+  --title "Books Scraping Pipeline - 10,000 Row Scale Report"
 ```
 
-![Sample scraping report](docs/assets/scraping-report-preview.png)
+This keeps the live scrape respectful while producing a larger validated dataset
+and PDF report for review.
+
+![10,000-row scraping report](docs/assets/scraping-report-preview.png)
 
 ### Books output columns
 

@@ -17,7 +17,7 @@ class FetchError(RuntimeError):
 class HttpClientConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    user_agent: str = "scrape-quality-pipeline/0.1 (+portfolio demo)"
+    user_agent: str = "scrape-quality-pipeline/0.1 (+public data demo)"
     timeout_seconds: float = Field(default=15.0, gt=0)
     max_retries: int = Field(default=3, ge=1)
     min_delay_seconds: float = Field(default=0.5, ge=0)

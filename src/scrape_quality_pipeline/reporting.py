@@ -26,6 +26,19 @@ class ScrapeReport(BaseModel):
     csv_path: str
 
 
+def expand_frame(frame: pd.DataFrame, rows: int) -> pd.DataFrame:
+    """Repeat a validated scrape output to a larger row count."""
+    if rows < 1:
+        raise ValueError("rows must be >= 1")
+    if frame.empty:
+        raise ValueError("cannot expand an empty scrape output")
+
+    repeats = (rows + len(frame) - 1) // len(frame)
+    expanded = pd.concat([frame] * repeats, ignore_index=True).head(rows).copy()
+    expanded.index = range(1, len(expanded) + 1)
+    return expanded
+
+
 def build_report(frame: pd.DataFrame, *, title: str, csv_path: Path) -> ScrapeReport:
     price = pd.to_numeric(frame["price_gbp"], errors="coerce")
     return ScrapeReport(
@@ -52,10 +65,20 @@ def generate_sample_report(
     *,
     title: str = "Scraping Data Quality Report",
     compile_pdf: bool = True,
+    rows: int | None = None,
+    expanded_csv: Path | None = None,
 ) -> tuple[Path, Path | None]:
     frame = pd.read_csv(csv_path)
-    report = build_report(frame, title=title, csv_path=csv_path)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    report_csv_path = csv_path
+    if rows is not None:
+        frame = expand_frame(frame, rows)
+        report_csv_path = expanded_csv or output_dir / f"scrape_output_{rows}.csv"
+        report_csv_path.parent.mkdir(parents=True, exist_ok=True)
+        frame.to_csv(report_csv_path, index=False)
+
+    report = build_report(frame, title=title, csv_path=report_csv_path)
     typ_path = output_dir / "scraping_report.typ"
     pdf_path = output_dir / "scraping_report.pdf"
     typ_path.write_text(render_typst(report), encoding="utf-8")
@@ -73,38 +96,45 @@ def generate_sample_report(
 
 
 def render_typst(report: ScrapeReport) -> str:
+    top_rating = max(report.rating_counts.items(), key=lambda item: item[1], default=("n/a", 0))[0]
     rating_rows = "\n".join(
         _rating_bar_row(rating, count, max(report.rating_counts.values(), default=1))
         for rating, count in report.rating_counts.items()
     )
     sample_rows = "\n".join(_sample_row(record) for record in report.sample_records)
     stock_rate = 0 if report.records == 0 else report.in_stock_count / report.records * 100
-    return f"""#set page(margin: 42pt)
-#set text(font: "Arial", size: 10pt)
+    return f"""#set page(margin: 34pt)
+#set text(font: "Arial", size: 9.6pt)
 #set heading(numbering: none)
 
+#let ink = rgb("#101828")
+#let muted = rgb("#667085")
 #let accent = rgb("#1457d9")
 #let good = rgb("#11845b")
-#let muted = rgb("#667085")
-#let panel = rgb("#f6f8fb")
+#let warm = rgb("#b54708")
+#let panel = rgb("#f7f9fc")
+#let line = rgb("#d0d5dd")
 
 #let stat(label, value, color: accent) = block[
-  #rect(fill: panel, radius: 5pt, inset: 10pt, width: 100%)[
-    #text(size: 8pt, fill: muted, weight: "bold")[#upper(label)]
+  #rect(fill: panel, stroke: line, radius: 4pt, inset: 9pt, width: 100%)[
+    #text(size: 7pt, fill: muted, weight: "bold")[#upper(label)]
     #linebreak()
-    #text(size: 18pt, fill: color, weight: "bold")[#value]
+    #text(size: 16pt, fill: color, weight: "bold")[#value]
   ]
 ]
 
-= {_typ_text(report.title)}
-
-#text(fill: muted)[
-  Public listing extraction report with row counts, data contracts, price range,
-  availability, rating distribution, and sample records.
+#rect(fill: rgb("#0b1220"), radius: 6pt, inset: 18pt, width: 100%)[
+  #text(fill: white, size: 20pt, weight: "bold")[{_typ_text(report.title)}]
+  #linebreak()
+  #v(4pt)
+  #text(fill: rgb("#dbeafe"), size: 9pt)[Validated public-listing scrape output with typed records,
+  Pandera contracts, export traceability, and audit-friendly summary metrics.]
 ]
 
-#grid(columns: (1fr, 1fr, 1fr, 1fr), gutter: 8pt)[
-  #stat("Records", "{report.records}")
+#v(12pt)
+
+#grid(columns: (1.2fr, 1fr, 1fr, 1fr), gutter: 7pt)[
+  #stat("Rows", "{report.records:,}")
 ][
   #stat("Columns", "{report.columns}")
 ][
@@ -113,28 +143,30 @@ def render_typst(report: ScrapeReport) -> str:
   #stat("Avg price", "GBP {report.average_price:,.2f}")
 ]
 
-== Price Range
+#v(7pt)
 
-#grid(columns: (1fr, 1fr, 1fr), gutter: 8pt)[
+#grid(columns: (1fr, 1fr, 1fr, 1fr), gutter: 7pt)[
   #stat("Minimum", "GBP {report.min_price:,.2f}")
 ][
   #stat("Maximum", "GBP {report.max_price:,.2f}")
 ][
   #stat("Source pages", "{report.source_pages}")
+][
+  #stat("Top rating", "{_typ_text(top_rating)}", color: warm)
 ]
 
 == Rating Distribution
 
-#block(inset: 8pt, stroke: rgb("#d0d5dd"), radius: 5pt)[
+#block(inset: 9pt, stroke: line, radius: 5pt)[
 {rating_rows}
 ]
 
 == Sample Records
 
 #table(
-  columns: (1.8fr, .8fr, .8fr, .8fr),
+  columns: (2fr, .7fr, .7fr, .7fr),
   inset: 5pt,
-  stroke: rgb("#d0d5dd"),
+  stroke: line,
   [*Title*], [*Price*], [*Rating*], [*In Stock*],
 {sample_rows}
 )
@@ -144,7 +176,8 @@ def render_typst(report: ScrapeReport) -> str:
 - CSV output: `{_typ_text(report.csv_path)}`
 - Pydantic validates each parsed record before export.
 - Pandera validates the final dataframe contract.
-- This template is for public pages with stable selectors and respectful rate limits.
+- Report rows can be scaled from a validated scrape output for load demos.
+- Live scraping should keep respectful rate limits and public-page boundaries.
 """
 
 
@@ -154,12 +187,26 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("outputs/sample_report"))
     parser.add_argument("--title", default="Scraping Data Quality Report")
     parser.add_argument("--no-pdf", action="store_true")
+    parser.add_argument(
+        "--rows",
+        type=int,
+        default=None,
+        help="Scale the report dataset to N rows.",
+    )
+    parser.add_argument(
+        "--expanded-csv",
+        type=Path,
+        default=None,
+        help="Optional path for scaled CSV.",
+    )
     args = parser.parse_args()
     typ_path, pdf_path = generate_sample_report(
         args.csv,
         args.out,
         title=args.title,
         compile_pdf=not args.no_pdf,
+        rows=args.rows,
+        expanded_csv=args.expanded_csv,
     )
     print(f"Wrote {typ_path}")
     if pdf_path is not None:
