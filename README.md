@@ -1,4 +1,9 @@
-# Scrape Quality Pipeline
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo-light.svg" alt="Scrape Quality Pipeline" width="620">
+  </picture>
+</h1>
 
 [![CI](https://github.com/emirhuseynrmx/scraping-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/emirhuseynrmx/scraping-data-pipeline/actions)
 [![codecov](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline/branch/main/graph/badge.svg)](https://codecov.io/gh/emirhuseynrmx/scraping-data-pipeline)

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="200" viewBox="0 0 720 200" role="img" aria-label="Scrape Quality Pipeline">
+  <rect width="720" height="200" rx="20" fill="#ffffff"/>
+  <g transform="translate(36 40)"><rect x="6" y="16" width="62" height="88" rx="10" fill="#f6f8fa" stroke="#afb8c1" stroke-width="2"/>
+<rect x="6" y="16" width="62" height="16" rx="8" fill="#afb8c1"/>
+<rect x="16" y="44" width="42" height="6" rx="3" fill="#afb8c1"/><rect x="16" y="58" width="30" height="6" rx="3" fill="#afb8c1"/>
+<rect x="16" y="72" width="38" height="6" rx="3" fill="#afb8c1"/>
+<path d="M50 88 l14 -2" stroke="#0b7285" stroke-width="0"/><rect x="70" y="44" width="40" height="10" rx="3" fill="#0b7285"/><rect x="70" y="60" width="40" height="10" rx="3" fill="#afb8c1"/><rect x="70" y="76" width="40" height="10" rx="3" fill="#afb8c1"/><rect x="70" y="92" width="40" height="10" rx="3" fill="#afb8c1"/></g>
+  <text x="186" y="84" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#1f2328" letter-spacing="-0.5">Scrape Quality</text><text x="186" y="126" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#1f2328" letter-spacing="-0.5">Pipeline</text>
+  <text x="187" y="160" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" fill="#6e7781">Web pages into validated, typed CSV and JSONL</text>
+</svg>
